@@ -1,0 +1,26 @@
+CREATE TABLE categories
+(
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(256) NOT NULL,
+	description TEXT NOT NULL
+);
+
+CREATE TABLE users
+(
+	id SERIAL PRIMARY KEY,
+	pass_hash CHAR(32) NOT NULL,
+	pass_salt CHAR(32) NOT NULL,
+	username VARCHAR(64) UNIQUE NOT NULL,
+	email VARCHAR(254) UNIQUE NOT NULL
+);
+
+CREATE TABLE threads
+(
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(256) NOT NULL,
+	html TEXT NOT NULL,
+	raw_text TEXT NOT NULL,
+
+	user_id INTEGER REFERENCES users (id) ON DELETE RESTRICT,
+	category_id INTEGER REFERENCES categories (id) ON DELETE RESTRICT
+);

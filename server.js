@@ -1,59 +1,71 @@
 var WebSocketServer = require("ws").Server;
+var pg = require("pg");
 var fs = require("fs");
 
-var methods = require("./methods");
-
+fs.unlinkSync("latest.log");
 var conf = JSON.parse(fs.readFileSync("conf.json"));
 
-var wss = new WebSocketServer(
-{
-	"port": conf.port
-});
+var ctx = {};
 
-wss.on("connection", function(sock)
+ctx.conf = JSON.parse(fs.readFileSync("conf.json"));
+ctx.db = new pg.Client(conf.postgres);
+ctx.util = require("./util");
+ctx.methods = require("./methods");
+
+ctx.db.connect(function(err)
 {
-	sock.on("message", function(data)
+	ctx.util.log("severe", "Could not connect to postgres database.", err);
+
+	var wss = new WebSocketServer(
 	{
-		var msg = JSON.parse(data);
-		var meth = methods[msg.m];
-		var req = new Request(msg.r, sock);
-
-		if (meth === undefined)
-		{
-			console.log("No such method: "+msg.m);
-			req.error("ENOMETH");
-		}
-		else
-		{
-			meth(req, msg.d);
-		}
+		"port": conf.port
 	});
-	console.log("New connection!");
-});
 
-var Request = function(requestId, sock)
-{
-	this.requestId = requestId;
-	this.sock = sock;
-}
-
-Request.prototype =
-{
-	"reply": function(data)
+	wss.on("connection", function(sock)
 	{
-		this.sock.send(JSON.stringify(
+		sock.on("message", function(data)
 		{
-			"r": this.requestId,
-			"d": data
-		}));
-	},
+			var msg = JSON.parse(data);
+			var meth = ctx.methods[msg.m];
+			var req = new Request(msg.r, sock);
 
-	"error": function(msg)
+			if (meth === undefined)
+			{
+				console.log("No such method: "+msg.m);
+				req.error("ENOMETH");
+			}
+			else
+			{
+				meth(req, msg.d);
+			}
+		});
+		console.log("New connection!");
+	});
+
+	var Request = function(requestId, sock)
 	{
-		this.sock.send(JSON.stringify(
-		{
-			"r": this.requestId,
-			"err": msg
-		}));
+		this.requestId = requestId;
+		this.sock = sock;
 	}
-}
+
+	Request.prototype =
+	{
+		"reply": function(data)
+		{
+			this.sock.send(JSON.stringify(
+			{
+				"r": this.requestId,
+				"d": data
+			}));
+		},
+
+		"error": function(msg)
+		{
+			this.sock.send(JSON.stringify(
+			{
+				"r": this.requestId,
+				"err": msg
+			}));
+		}
+	}
+});

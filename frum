@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+var fs = require("fs");
+var spawn = require("child_process").spawn;
+var pg = require("pg");
+
+var conf = JSON.parse(fs.readFileSync("conf.json"));
+var pgClient = new pg.Client(conf.postgres);
+
+switch (process.argv[2])
+{
+case "start":
+	if (fs.existsSync(".pid"))
+		return console.log("Frum is already runing.");
+
+	var child = spawn("node", ["server.js"]);
+	fs.writeFileSync(".pid", child.pid);
+	console.log("Running with PID "+child.pid+".");
+
+	break;
+
+case "stop":
+	if (!fs.existsSync(".pid"))
+		return console.log("Frum is not running.");
+
+	try
+	{
+		process.kill(fs.readFileSync(".pid"));
+	}
+	catch(err)
+	{
+		if (err.code !== "ESRCH")
+			return console.log("Could not kill process", err);
+	}
+
+	fs.unlinkSync(".pid");
+
+	break;
+
+case "setup":
+	if (fs.existsSync(".pid"))
+		return console.log("Please stop Frum first.");
+
+	var sql = fs.readFileSync("sql/setup.sql", "UTF-8");
+
+	pgClient.connect(function(err)
+	{
+		console.log(sql);
+		if (err) return console.log("Could not connect to postgres", err);
+		console.log("Connected.");
+
+		pgClient.query(sql, function(err, result)
+		{
+			if (err) return console.log("Error running query", err);
+			console.log("Query executed.");
+
+			process.exit();
+		});
+	});
+
+	break;
+
+default:
+	console.log("Usage: frum <start|stop|setup");
+
+	break;
+}
