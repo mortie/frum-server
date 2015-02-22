@@ -1,0 +1,17 @@
+{
+	"name": "frum-server",
+	"version": "0.0.1",
+	"description": "Server for the frum forum software.",
+	"license": "GPL-2.0",
+	"author":
+	{
+		"name": "Martin Dørum Nygaard",
+		"email": "martid0311@gmail.com",
+		"url": "http://www.mort.coffee"
+	},
+
+	"dependencies":
+	{
+		"ws": "0.7.x"
+	}
+}
