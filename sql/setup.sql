@@ -1,6 +1,7 @@
 CREATE TABLE categories
 (
 	id SERIAL PRIMARY KEY,
+	sort SERIAL UNIQUE,
 	name VARCHAR(256) NOT NULL,
 	description TEXT NOT NULL
 );
@@ -8,10 +9,10 @@ CREATE TABLE categories
 CREATE TABLE users
 (
 	id SERIAL PRIMARY KEY,
-	pass_hash CHAR(32) NOT NULL,
-	pass_salt CHAR(32) NOT NULL,
+	pass_hash CHAR(128) NOT NULL,
 	username VARCHAR(64) UNIQUE NOT NULL,
-	email VARCHAR(254) UNIQUE NOT NULL
+	email VARCHAR(254) UNIQUE NOT NULL,
+	date_created TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE threads
@@ -20,7 +21,19 @@ CREATE TABLE threads
 	name VARCHAR(256) NOT NULL,
 	html TEXT NOT NULL,
 	raw_text TEXT NOT NULL,
+	date_created TIMESTAMP WITH TIME ZONE,
 
 	user_id INTEGER REFERENCES users (id) ON DELETE RESTRICT,
 	category_id INTEGER REFERENCES categories (id) ON DELETE RESTRICT
+);
+
+CREATE TABLE posts
+(
+	ID SERIAL PRIMARY KEY,
+	html TEXT NOT NULL,
+	raw_text TEXT NOT NULL,
+	date_created TIMESTAMP WITH TIME ZONE,
+
+	user_id INTEGER REFERENCES users (id) ON DELETE RESTRICT,
+	thread_id INTEGER REFERENCES threads (id) ON DELETE RESTRICT
 );

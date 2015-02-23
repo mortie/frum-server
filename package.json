@@ -3,6 +3,12 @@
 	"version": "0.0.1",
 	"description": "Server for the frum forum software.",
 	"license": "GPL-2.0",
+	"repository":
+	{
+		"type": "git",
+		"url": "https://github.com/mortie/frum-server.git"
+	},
+	"homepage": "https://github.com/mortie/frum-server",
 	"author":
 	{
 		"name": "Martin Dørum Nygaard",
@@ -13,6 +19,8 @@
 	"dependencies":
 	{
 		"ws": "0.7.x",
-		"pg": "4.2.x"
+		"pg": "4.2.x",
+		"scrypt": "3.0.x",
+		"prompt": "0.2.x"
 	}
 }

@@ -18,20 +18,20 @@ module.exports =
 		if (err === undefined || err)
 		{
 			if (err)
-				msg = logSeverities[severity]+": "+msg+" ("+err+")\n";
+				msg = logSeverities[severity]+msg+" ("+err+")";
 			else
-				msg = severity+": "+msg+"\n";
+				msg = logSeverities[severity]+msg;
 
 			console.log(msg);
 
 			if (severity === "severe")
 			{
-				fs.appendFileSync("latest.log", msg);
+				fs.appendFileSync("latest.log", msg+"\n");
 				process.exit();
 			}
 			else
 			{
-				fs.writeFile("latest.log", msg);
+				fs.writeFile("latest.log", msg+"\n");
 			}
 		}
 	},

@@ -3,14 +3,41 @@
 var fs = require("fs");
 var spawn = require("child_process").spawn;
 var pg = require("pg");
+var prompt = require("prompt");
 
 var conf = JSON.parse(fs.readFileSync("conf.json"));
-var pgClient = new pg.Client(conf.postgres);
+
+function isRunning()
+{
+	return (fs.existsSync(".pid"));
+}
+
+function query(sql, cb)
+{
+	if (typeof sql !== "string")
+		throw new Error("Sql query must be a string.");
+
+	var pgClient = new pg.Client(conf.postgres);
+
+	pgClient.connect(function(err)
+	{
+		if (err)
+			return cb("Could not connect to postgres. "+err);
+
+		pgClient.query(sql, function(err, result)
+		{
+			if (err)
+				return cb("Error running query. "+err);
+
+			cb();
+		});
+	});
+}
 
 switch (process.argv[2])
 {
 case "start":
-	if (fs.existsSync(".pid"))
+	if (isRunning())
 		return console.log("Frum is already runing.");
 
 	var child = spawn("node", ["server.js"]);
@@ -20,7 +47,7 @@ case "start":
 	break;
 
 case "stop":
-	if (!fs.existsSync(".pid"))
+	if (!isRunning())
 		return console.log("Frum is not running.");
 
 	try
@@ -30,7 +57,7 @@ case "stop":
 	catch(err)
 	{
 		if (err.code !== "ESRCH")
-			return console.log("Could not kill process", err);
+			return console.log("Could not kill process.", err);
 	}
 
 	fs.unlinkSync(".pid");
@@ -38,21 +65,47 @@ case "stop":
 	break;
 
 case "setup":
-	if (fs.existsSync(".pid"))
+	if (isRunning())
 		return console.log("Please stop Frum first.");
 
 	var sql = fs.readFileSync("sql/setup.sql", "UTF-8");
 
-	pgClient.connect(function(err)
+	query(sql, function(err)
 	{
-		console.log(sql);
-		if (err) return console.log("Could not connect to postgres", err);
-		console.log("Connected.");
+		if (err)
+			console.log(err, "\nYou may need to reset the database first.");
+		else
+			console.log("Database setup complete.");
 
-		pgClient.query(sql, function(err, result)
+		process.exit();
+	});
+
+	break;
+
+case "reset":
+	if (isRunning())
+		return console.log("Please stop Frum first.");
+
+	prompt.start();
+	prompt.message = "This will delete everything from the database, and cannot be undone. Are you sure?";
+	prompt.delimiter = " ";
+	prompt.colors = false;
+	prompt.get(["y/n"], function(err, result)
+	{
+		if (err)
+			return;
+
+		if (result["y/n"] !== "y")
+			return console.log("Not resetting the database.");
+
+		var sql = fs.readFileSync("sql/reset.sql", "utf-8");
+
+		query(sql, function(err)
 		{
-			if (err) return console.log("Error running query", err);
-			console.log("Query executed.");
+			if (err)
+				console.log(err);
+			else
+				console.log("Database reset.");
 
 			process.exit();
 		});
@@ -61,7 +114,7 @@ case "setup":
 	break;
 
 default:
-	console.log("Usage: frum <start|stop|setup");
+	console.log("Usage: frum <start|stop|setup|reset>");
 
 	break;
 }
