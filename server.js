@@ -27,14 +27,15 @@ ctx.db.connect(function(err)
 	var wss = new WebSocketServer(
 	{
 		"port": ctx.conf.port
+	}, function()
+	{
+		ctx.util.log("info", "Started server on port "+ctx.conf.port+".");
 	});
-
-	ctx.util.log("info", "Started server on port "+ctx.conf.port+".");
 
 	wss.on("connection", function(sock)
 	{
 
-		var user = new User();
+		var session = new Session();
 
 		sock.on("message", function(data)
 		{
@@ -45,14 +46,26 @@ ctx.db.connect(function(err)
 			if (meth === undefined)
 			{
 				console.log("No such method: "+msg.m);
-				req.error("ENOMETH");
+				return req.fail("ENOMETH");
 			}
-			else
+
+			if (meth.args !== undefined)
 			{
-				meth(req, msg.d, ctx, user);
+				for (var i in meth.args)
+				{
+					if (typeof msg.d[i] !== meth.args[i])
+						return req.fail("EBADARGS");
+				}
 			}
+
+			meth(req, msg.d, ctx, session);
 		});
 		console.log("New connection!");
+	});
+
+	wss.on("error", function(err)
+	{
+		ctx.util.log("severe", "WebSocket server error.", err);
 	});
 });
 
@@ -69,11 +82,11 @@ Request.prototype =
 		this.sock.send(JSON.stringify(
 		{
 			"r": this.requestId,
-			"d": data
+			"d": data || {}
 		}));
 	},
 
-	"error": function(msg)
+	"fail": function(msg)
 	{
 		this.sock.send(JSON.stringify(
 		{
@@ -83,72 +96,8 @@ Request.prototype =
 	}
 }
 
-var User = function()
+var Session = function()
 {
 	this.loggedIn = false;
-}
-
-User.prototype =
-{
-	"login": function(username, password, cb)
-	{
-		//Both username and password has to be strings.
-		try
-		{
-			ctx.util.checkType(username, "string");
-			ctx.util.checkType(password, "string");
-		}
-		catch (err)
-		{
-			ctx.util.log("warning", "Type mismatch.", err);
-			return cb(false);
-		}
-
-		//Query the database for users with the provided username
-		ctx.db.query(
-		"SELECT pass_hash FROM users WHERE username=$1",
-		[username],
-		function(err, res)
-		{
-			ctx.util.log("warning", "Error querying database for user.", err);
-
-			//If no rows are returned, the username doesn't exist
-			if (res.rowCount === 0)
-				return cb(false);
-
-			var user = res.rows[0];
-
-			//verify that the password matches the hash
-			scrypt.verifyHash(user.pass_hash, password, function(err, result)
-			{
-				cb(result);
-			}.bind(this));
-		}.bind(this));
-	},
-
-	"register": function(username, password, email, cb)
-	{
-		ctx.db.query(
-		"SELECT FROM users WHERE username=$1",
-		[username],
-		function(err, res)
-		{
-			ctx.util.log("warning", "Error querying database for user.", err);
-			if (err)
-				return cb(false);
-
-			ctx.db.query(
-			"INSERT INTO users (username, pass_hash, email)"+
-			"VALUES ($1), ($2), ($3)",
-			[username, scrypt.passwordHashSync(password), email],
-			function(err, res)
-			{
-				ctx.util.log("warning", "Error inserting user to database.", err);
-				if (err)
-					return cb(false);
-
-				cb(true);
-			});
-		});
-	}
+	this.userId = 0;
 }

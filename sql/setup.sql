@@ -1,18 +1,18 @@
 CREATE TABLE categories
 (
 	id SERIAL PRIMARY KEY,
-	sort SERIAL UNIQUE,
 	name VARCHAR(256) NOT NULL,
+	sort SERIAL UNIQUE,
 	description TEXT NOT NULL
 );
 
 CREATE TABLE users
 (
 	id SERIAL PRIMARY KEY,
-	pass_hash CHAR(128) NOT NULL,
 	username VARCHAR(64) UNIQUE NOT NULL,
-	email VARCHAR(254) UNIQUE NOT NULL,
-	date_created TIMESTAMP WITH TIME ZONE
+	pass_hash CHAR(128) NOT NULL,
+	auth_token CHAR(128) NOT NULL,
+	date_created TIMESTAMP WITHOUT TIME ZONE
 );
 
 CREATE TABLE threads
