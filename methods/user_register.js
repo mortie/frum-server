@@ -86,7 +86,10 @@ module.exports = function(req, data, ctx, session)
 		session.userId = user.id;
 
 		ctx.util.log("info", "User '"+data.username+"' registered successfully.");
-		req.reply(user.auth_token);
+		req.reply(
+		{
+			"token": user.auth_token
+		});
 	}
 }
 

@@ -19,6 +19,7 @@ ctx.conf = JSON.parse(fs.readFileSync("conf.json"));
 ctx.db = new pg.Client(ctx.conf.postgres);
 ctx.util = require("./util");
 ctx.methods = require("./methods");
+ctx.sessions = [];
 
 ctx.db.connect(function(err)
 {
@@ -34,11 +35,13 @@ ctx.db.connect(function(err)
 
 	wss.on("connection", function(sock)
 	{
-		var session = new Session();
+		var session = new Session(sock);
+		ctx.sessions.push(session);
 
 		sock.on("close", function(msg)
 		{
 			delete session;
+			delete sock;
 		});
 
 		sock.on("message", function(data)
@@ -104,8 +107,35 @@ Request.prototype =
 	}
 }
 
-var Session = function()
+var Session = function(sock)
 {
+	this.sock = sock;
 	this.loggedIn = false;
-	this.userId = 0;
+	this.userId;
+}
+
+Session.prototype  =
+{
+	"send": function(evt, data)
+	{
+		this.sock.send(JSON.stringify(
+		{
+			"e": evt,
+			"d": data  || {}
+		}));
+	},
+
+	"logout": function()
+	{
+		this.loggedIn = false;
+		delete this.userId;
+		this.send("logout");
+	},
+
+	"login": function(uid)
+	{
+		this.loggedIn = true;
+		this.userId = uid;
+		this.send("login");
+	}
 }

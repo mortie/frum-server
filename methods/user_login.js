@@ -33,8 +33,7 @@ module.exports = function(req, data, ctx, session)
 			if (err)
 				return req.fail("EBADLOGIN");
 
-			session.loggedIn = true;
-			session.userId = user.id;
+			session.login(user.id):
 
 			ctx.util.log("info", "User '"+data.username+"' logged in successfully.");
 			req.reply(
