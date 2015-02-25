@@ -1,5 +1,4 @@
 var scrypt = require("scrypt");
-var async = require("async");
 
 module.exports = function(req, data, ctx, session)
 {
