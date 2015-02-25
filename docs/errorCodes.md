@@ -6,6 +6,7 @@ This is a list of possible error codes returned to the client by the server.
 * EUNKNOWN: An unknown error occurred (all)
 * EBADARGS: Bad arguments (all)
 * EUSEREXISTS: User already exists (user_register)
+* EINVITECODE: Invalid invite code supplied (user_register)
 * EBADLOGIN: Invalid username or pasword (user_login)
 * ELOGGEDIN: Already logged in (register, user_login)
 * ENOTLOGGEDIN: Not logged in (user_logout)

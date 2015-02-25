@@ -34,8 +34,12 @@ ctx.db.connect(function(err)
 
 	wss.on("connection", function(sock)
 	{
-
 		var session = new Session();
+
+		sock.on("close", function(msg)
+		{
+			delete session;
+		});
 
 		sock.on("message", function(data)
 		{
@@ -45,7 +49,7 @@ ctx.db.connect(function(err)
 
 			if (meth === undefined)
 			{
-				console.log("No such method: "+msg.m);
+				ctx.util.log("notice", "Bad request: No such method.");
 				return req.fail("ENOMETH");
 			}
 
@@ -54,13 +58,17 @@ ctx.db.connect(function(err)
 				for (var i in meth.args)
 				{
 					if (typeof msg.d[i] !== meth.args[i])
+					{
+						ctx.util.log("notice", "Bad request: Argument '"+i+"' missing.");
 						return req.fail("EBADARGS");
+					}
 				}
 			}
 
 			meth(req, msg.d, ctx, session);
 		});
-		console.log("New connection!");
+
+		ctx.util.log("info", "New connection.");
 	});
 
 	wss.on("error", function(err)

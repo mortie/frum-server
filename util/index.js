@@ -4,6 +4,7 @@ var logSeverities =
 {
 	"debug": "DEBUG: ",
 	"info": "INFO: ",
+	"notice": "NOTICE: ",
 	"warning": "WARNING: ",
 	"severe": "SEVERE: "
 }

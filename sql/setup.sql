@@ -15,6 +15,14 @@ CREATE TABLE users
 	date_created TIMESTAMP WITHOUT TIME ZONE
 );
 
+CREATE TABLE invite_codes
+(
+	id SERIAL PRIMARY KEY,
+	code CHAR(64),
+
+	user_id INTEGER REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE threads
 (
 	id SERIAL PRIMARY KEY,

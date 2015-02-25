@@ -1,23 +1,28 @@
 var scrypt = require("scrypt");
+var async = require("async");
 
 module.exports = function(req, data, ctx, session)
 {
 	if (session.loggedIn)
-		return cb("ELOGGEDIN");
+		return req.fail("ELOGGEDIN");
 
-	//Query the database for users with the provided username
 	ctx.db.query(
 		"SELECT id, pass_hash, auth_token "+
 		"FROM users "+
 		"WHERE username=$1",
 		[data.username],
-		function(err, res)
-	{
-		ctx.util.log("warning", "Error querying database for user.", err);
-		if (err)
-			return req.fail("EUNKNOWN");
+		queryCallback
+	);
 
-		//If no rows are returned, the user doesn't exist
+	function queryCallback(err, res)
+	{
+		if (err)
+		{
+			ctx.util.log("warning", "Failed to log in user.", err);
+			return req.fail("EUNKNOWN");
+		}
+
+		//if no rows are returned, the user doesn't exist
 		if (res.rowCount === 0)
 			return req.fail("EBADLOGIN");
 
@@ -38,7 +43,7 @@ module.exports = function(req, data, ctx, session)
 				"token": user.auth_token
 			});
 		});
-	});
+	}
 }
 
 module.exports.args =
