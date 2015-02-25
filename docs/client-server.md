@@ -111,14 +111,14 @@ Nothing.
 
 This is a list of possible error codes returned to the client by the server.
 
-* EUNKNOWN: An unknown error occurred (all)
-* ENOMETH: No such method (all)
-* EBADARGS: Bad arguments (all)
-* EUSEREXISTS: User already exists (user_create)
-* EINVITECODE: Invalid invite code supplied (user_create)
-* EBADLOGIN: Invalid username or pasword (session_login)
-* ELOGGEDIN: Already logged in (register, session_login)
-* ENOTLOGGEDIN: Not logged in (session_logout, session_logout_all, session_get_info)
+* **EUNKNOWN**: An unknown error occurred (all)
+* **ENOMETH**: No such method (all)
+* **EBADARGS**: Bad arguments (all)
+* **EUSEREXISTS**: User already exists (user_create)
+* **EINVITECODE**: Invalid invite code supplied (user_create)
+* **EBADLOGIN**: Invalid username or pasword (session_login)
+* **ELOGGEDIN**: Already logged in (register, session_login)
+* **ENOTLOGGEDIN**: Not logged in (session_logout, session_logout_all, session_get_info)
 
 ---
 
