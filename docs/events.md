@@ -1,4 +1,4 @@
-# Methods
+# Events
 
 These are "events", messages the server sends to the client that aren't triggered directly by a method call.
 
