@@ -52,7 +52,7 @@ ctx.db.connect(function(err)
 
 			if (meth === undefined)
 			{
-				ctx.util.log("notice", "Bad request: No such method.");
+				ctx.util.log("notice", "Bad request: No such method: '"+msg.m+"'");
 				return req.fail("ENOMETH");
 			}
 

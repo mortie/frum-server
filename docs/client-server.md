@@ -81,6 +81,18 @@ Log in with auth token instead of username and password.
 
 Nothing.
 
+### session_get_info
+
+Get info about the currently logged in user.
+
+**Arguments**:
+
+None.
+
+**Returns**:
+
+* **username**
+
 ### session_logout
 
 Log out. Session will be flagged as logged out if successful.
@@ -105,6 +117,47 @@ None.
 
 Nothing.
 
+### threads_get_front
+
+Get a list of the threads on the front page.
+
+**Arguments**:
+
+* **count**: Amount of posts you want.
+* **offset**: Offset, to make pagination possible. Offset = (page-1) * count.
+
+**Returns**:
+
+* **threads**: Array of objects:
+	[
+		{
+			category_id
+			date_created
+			id
+			name
+			user_id
+			username
+		}
+	]
+
+### thread_get
+
+Get contents of a thread.
+
+**Arguments**:
+
+* **id**
+
+**Returns**:
+
+* **category_id**
+* **date_created**
+* **id**
+* **name**
+* **user_id**
+* **username**
+* **html**
+
 ---
 
 ## Error Codes
@@ -116,8 +169,8 @@ This is a list of possible error codes returned to the client by the server.
 * **EBADARGS**: Bad arguments (all)
 * **EUSEREXISTS**: User already exists (user_create)
 * **EINVITECODE**: Invalid invite code supplied (user_create)
-* **EBADLOGIN**: Invalid username or pasword (session_login)
-* **ELOGGEDIN**: Already logged in (register, session_login)
+* **EBADLOGIN**: Invalid username, pasword, or auth token (session_login, session_token_auth)
+* **ELOGGEDIN**: Already logged in (register, session_login, session_token_auth)
 * **ENOTLOGGEDIN**: Not logged in (session_logout, session_logout_all, session_get_info)
 
 ---

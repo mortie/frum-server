@@ -4,7 +4,7 @@ module.exports = function(req, data, ctx, session)
 		return req.fail("ENOTLOGGEDIN");
 
 	ctx.db.query(
-		"SELECT username, date_created "+
+		"SELECT username "+
 		"FROM users "+
 		"WHERE id=$1",
 		[session.userId],
@@ -13,8 +13,11 @@ module.exports = function(req, data, ctx, session)
 
 	function queryCallback(err, res)
 	{
+		var user = res.rows[0];
+
 		req.reply(
 		{
-			"user": 
+			"username": user.username
+		});
 	}
 }
