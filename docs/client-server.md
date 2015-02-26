@@ -159,6 +159,25 @@ Get contents of a thread.
 * **username**
 * **html**
 
+### categories_get
+
+Get a list of categories.
+
+**Arguments**:
+
+None.
+
+**Retuns**:
+
+* **categories**: An array of objects:
+	[
+		{
+			id
+			name
+			description
+		}
+	]
+
 ---
 
 ## Error Codes
