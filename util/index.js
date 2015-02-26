@@ -43,5 +43,31 @@ module.exports =
 		{
 			throw new Error("Type mismatch: value should have been "+type+" but is "+(typeof val));
 		}
+	},
+
+	"getPerms": function(db, id, cb)
+	{
+		db.query(
+			"SELECT groups.* "+
+			"FROM users, groups "+
+			"WHERE users.id = $1 "+
+			"AND users.group_id = groups.id",
+			[id],
+			queryCallback
+		);
+
+		function queryCallback(err, res)
+		{
+			if (err)
+			{
+				ctx.util.log("warning", "Failed to query for permissions.", err);
+				return cb("EUNKNOWN");
+			}
+
+			if (res.rowCount !== 1)
+				return cb("ENOPERM");
+
+			cb(undefined, res.rows[0]);
+		}
 	}
 }

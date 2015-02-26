@@ -5,6 +5,9 @@ module.exports = function(req, data, ctx, session)
 	if (session.loggedIn)
 		return req.fail("ELOGGEDIN");
 
+	if (data.password.length < 1)
+		return req.fail("EBADLOGIN");
+
 	ctx.db.query(
 		"SELECT id, pass_hash, auth_token "+
 		"FROM users "+

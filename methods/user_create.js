@@ -56,8 +56,8 @@ module.exports = function(req, data, ctx, session)
 		}
 
 		ctx.db.query(
-			"INSERT INTO users (username, pass_hash, auth_token, date_created) "+
-			"VALUES ($1, $2, $3, NOW()) "+
+			"INSERT INTO users (username, pass_hash, auth_token) "+
+			"VALUES ($1, $2, $3) "+
 			"RETURNING id, auth_token",
 			[
 				data.username,

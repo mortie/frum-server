@@ -1,3 +1,7 @@
+DROP FUNCTION IF EXISTS delete_old_invite_codes() CASCADE;
+DROP TRIGGER IF EXISTS delete_old_invite_codes_gc ON invite_codes CASCADE;
+
+DROP TABLE IF EXISTS groups CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS invite_codes CASCADE;

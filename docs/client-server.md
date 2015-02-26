@@ -117,7 +117,7 @@ None.
 
 Nothing.
 
-### threads_get_
+### threads_get
 
 Get a list of the most recent threads.
 
@@ -152,6 +152,7 @@ Get contents of a thread.
 **Returns**:
 
 * **category_id**
+* **category_name**
 * **date_created**
 * **id**
 * **name**
@@ -178,6 +179,18 @@ None.
 		}
 	]
 
+### invite_code_create
+
+Get an invite code to invite other members.
+
+**Arguments**:
+
+None.
+
+**Returns**:
+
+* **code**
+
 ---
 
 ## Error Codes
@@ -192,6 +205,7 @@ This is a list of possible error codes returned to the client by the server.
 * **EBADLOGIN**: Invalid username, pasword, or auth token (session_login, session_token_auth)
 * **ELOGGEDIN**: Already logged in (register, session_login, session_token_auth)
 * **ENOTLOGGEDIN**: Not logged in (session_logout, session_logout_all, session_get_info)
+* **ENOPERM**: Permission denied (invite_code_create)
 
 ---
 

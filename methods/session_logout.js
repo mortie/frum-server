@@ -1,7 +1,7 @@
 module.exports = function(req, data, ctx, session)
 {
 	if (!session.loggedIn)
-		return cb("ENOTLOGGEDIN");
+		return req.fail("ENOTLOGGEDIN");
 
 	session.logout();
 	req.reply();

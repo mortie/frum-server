@@ -5,9 +5,11 @@ module.exports = function(req, data, ctx, session)
 
 	ctx.db.query(
 		"SELECT threads.id, threads.name, threads.date_created, "+
-		"       threads.user_id, threads.category_id, users.username, users.id "+
-		"FROM threads, users "+
-		"WHERE users.id = threads.user_id "+
+		"       threads.user_id, threads.category_id, users.username,  "+
+		"       categories.name AS category_name "+
+		"FROM threads, users, categories "+
+		"WHERE threads.user_id = users.id "+
+		"AND threads.category_id = categories.id "+
 		(categoryId ? "AND threads.category_id = "+categoryId : "")+
 		"ORDER BY threads.date_created DESC "+
 		"LIMIT "+data.count+" "+

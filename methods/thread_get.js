@@ -2,9 +2,11 @@ module.exports = function(req, data, ctx, session)
 {
 	ctx.db.query(
 		"SELECT threads.id, threads.name, threads.date_created, threads.html, "+
-		"       threads.user_id, threads.category_id, users.username, users.id "+
-		"FROM threads, users "+
-		"WHERE threads.id=$1",
+		"       threads.user_id, threads.category_id, users.username, users.id, "+
+		"       categories.name AS category_name "+
+		"FROM threads, users, categories "+
+		"WHERE threads.user_id = users.id "+
+		"AND threads.id = $1",
 		[data.id],
 		queryCallback
 	);
