@@ -117,14 +117,15 @@ None.
 
 Nothing.
 
-### threads_get_front
+### threads_get_
 
-Get a list of the threads on the front page.
+Get a list of the most recent threads.
 
 **Arguments**:
 
 * **count**: Amount of posts you want.
 * **offset**: Offset, to make pagination possible. Offset = (page-1) * count.
+* **category_id**: Optional. If provided, only threads from the desired category will be returned.
 
 **Returns**:
 
