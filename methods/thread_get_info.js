@@ -1,7 +1,7 @@
 module.exports = function(req, data, ctx, session)
 {
 	ctx.db.query(
-		"SELECT threads.id, threads.name, threads.date_created, threads.html, "+
+		"SELECT threads.id, threads.name, threads.date_created, "+
 		"       threads.user_id, threads.category_id, users.username, users.id, "+
 		"       categories.name AS category_name "+
 		"FROM threads, users, categories "+

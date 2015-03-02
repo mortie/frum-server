@@ -64,8 +64,13 @@ module.exports =
 				return cb("EUNKNOWN");
 			}
 
-			if (res.rowCount !== 1)
-				return cb("ENOPERM");
+			//filter out all properties which aren't permission flags
+			var perms = {};
+			for (var i in res)
+			{
+				if (i.indexOf("perm_") === 0)
+					perms[i] = res[i];
+			}
 
 			cb(undefined, res.rows[0]);
 		}

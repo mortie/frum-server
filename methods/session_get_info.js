@@ -13,6 +13,12 @@ module.exports = function(req, data, ctx, session)
 
 	function queryCallback(err, res)
 	{
+		if (err || res.rowCount === 0)
+		{
+			ctx.util.log("warning", "Failed to query for user.", err || undefined);
+			return req.fail("EUNKNOWN");
+		}
+
 		var user = res.rows[0];
 
 		req.reply(

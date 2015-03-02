@@ -1,24 +1,21 @@
-var crypto = require("crypto");
-
 module.exports = function(req, data, ctx, session)
 {
 	if (!session.loggedIn)
-		return req.fail("ENOTLOGGEDIN");
+		return req.fail("ENOPERM");
 
 	ctx.util.getPerms(ctx.db, session.userId, function(err, perms)
 	{
 		if (err)
 			return req.fail(err);
 
-		if (perms.perm_invite !== true)
+		if (!perms.perm_newcat)
 			return req.fail("ENOPERM");
 
-		var inviteCode = crypto.randomBytes(32).toString("hex");
-
 		ctx.db.query(
-			"INSERT INTO invite_codes (code, user_id) "+
-			"VALUES ($1, $2) ",
-			[inviteCode, session.userId],
+			"INSERT INTO categories (name,  description) "+
+			"VALUES ($1, $2) "+
+			"RETURNING id",
+			[data.name, data.description],
 			queryCallback
 		);
 
@@ -26,14 +23,20 @@ module.exports = function(req, data, ctx, session)
 		{
 			if (err)
 			{
-				ctx.util.log("warning", "Failed to execute query to create invite code.", err);
+				ctx.util.log("warning", "Failed query to create new category.", err);
 				return req.fail("EUNKNOWN");
 			}
 
 			req.reply(
 			{
-				"code": inviteCode
+				"id": res.rows[0].id
 			});
 		}
 	});
+}
+
+module.exports.args =
+{
+	"name": "string",
+	"description": "string"
 }

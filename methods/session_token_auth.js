@@ -25,8 +25,7 @@ module.exports = function(req, data, ctx, session)
 
 		var user = res.rows[0];
 
-		session.loggedIn = true;
-		session.userId = user.id;
+		session.login(user.id);
 
 		req.reply();;
 	}

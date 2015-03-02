@@ -40,8 +40,8 @@ ctx.db.connect(function(err)
 
 		sock.on("close", function(msg)
 		{
-			delete session;
-			delete sock;
+			session = undefined;
+			sock = undefined;
 		});
 
 		sock.on("message", function(data)
@@ -62,7 +62,7 @@ ctx.db.connect(function(err)
 				{
 					if (typeof msg.d[i] !== meth.args[i])
 					{
-						ctx.util.log("notice", "Bad request: Argument '"+i+"' missing.");
+						ctx.util.log("notice", "Bad request for method "+msg.m+": Argument '"+i+"' missing.");
 						return req.fail("EBADARGS");
 					}
 				}

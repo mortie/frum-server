@@ -141,9 +141,9 @@ Get a list of the most recent threads.
 		}
 	]
 
-### thread_get
+### thread_get_info
 
-Get contents of a thread.
+Get information about a thread.
 
 **Arguments**:
 
@@ -157,6 +157,21 @@ Get contents of a thread.
 * **id**
 * **name**
 * **user_id**
+* **username**
+
+### thread_get_posts
+
+Get comments from a thread.
+
+**Arguments**:
+
+* **id**
+* **count**: Amount of posts you want.
+* **offset**: Offset, to make pagination possible. Offset = (page-1) * count.
+
+**Returns**:
+
+* **date_created**
 * **username**
 * **html**
 

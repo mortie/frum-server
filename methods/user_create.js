@@ -15,7 +15,7 @@ module.exports = function(req, data, ctx, session)
 		ctx.db.query(
 			"SELECT id FROM invite_codes "+
 			"WHERE code=$1",
-			[req.inviteCode],
+			[data.inviteCode],
 			rejectIfInvalid
 		);
 	}
@@ -35,10 +35,6 @@ module.exports = function(req, data, ctx, session)
 				[res.rows[0].id],
 				insertUser
 			);
-		}
-		else if (!ctx.conf.requireInvites)
-		{
-			insertUser();
 		}
 		else
 		{

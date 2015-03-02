@@ -2,8 +2,10 @@ CREATE TABLE groups
 (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(64) NOT NULL,
-	perm_admin BOOLEAN NOT NULL,
-	perm_invite BOOLEAN NOT NULL
+	perm_invite BOOLEAN NOT NULL,
+	perm_newpost BOOLEAN NOT NULL,
+	perm_newthread BOOLEAN NOT NULL,
+	perm_newcat BOOLEAN NOT NULL
 );
 
 CREATE TABLE categories
@@ -22,7 +24,7 @@ CREATE TABLE users
 	auth_token CHAR(128) NOT NULL,
 	date_created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
 
-	group_id INTEGER REFERENCES groups ON DELETE RESTRICT
+	group_id INTEGER NOT NULL REFERENCES groups ON DELETE RESTRICT
 );
 
 CREATE TABLE invite_codes
@@ -31,40 +33,40 @@ CREATE TABLE invite_codes
 	code CHAR(64),
 	date_created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
 
-	user_id INTEGER REFERENCES users (id) ON DELETE CASCADE
+	user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE threads
 (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(256) NOT NULL,
-	html TEXT NOT NULL,
-	raw_text TEXT NOT NULL,
 	date_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 
-	user_id INTEGER REFERENCES users (id) ON DELETE RESTRICT,
-	category_id INTEGER REFERENCES categories (id) ON DELETE RESTRICT
+	user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+	category_id INTEGER NOT NULL REFERENCES categories (id) ON DELETE RESTRICT
 );
 
 
 CREATE TABLE posts
 (
-	ID SERIAL PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	html TEXT NOT NULL,
 	raw_text TEXT NOT NULL,
 	date_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 
-	user_id INTEGER REFERENCES users (id) ON DELETE RESTRICT,
-	thread_id INTEGER REFERENCES threads (id) ON DELETE RESTRICT
+	user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+	thread_id INTEGER NOT NULL REFERENCES threads (id) ON DELETE RESTRICT
 );
 
 
 --Create initial admin group.
 
-INSERT INTO groups (name, perm_admin, perm_invite)
+INSERT INTO groups (name, perm_invite, perm_newpost, perm_newthread, perm_newcat)
 VALUES
 (
 	'Admin',
+	TRUE,
+	TRUE,
 	TRUE,
 	TRUE
 );
@@ -82,6 +84,23 @@ VALUES
 	'66713e8fd159df4d91f5e554de1d8246ccf5241ff00ace5076678668ea7e2924fd6dc4b87629ff7a5bc8a01a5e3584e5ccac6dc5fab72b9b2deefbf7337a6970',
 	1
 );
+
+
+
+-- Set sort value of new categories automatically
+
+CREATE FUNCTION categories_insert() RETURNS trigger
+	LANGUAGE plpgsql
+	AS $$
+BEGIN
+	NEW.sort := NEW.id;
+	RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER categories_insert_gc
+	BEFORE INSERT ON categories
+	FOR EACH ROW EXECUTE PROCEDURE categories_insert();
 
 
 -- Automatically delete invite codes that are over 2 days old.
