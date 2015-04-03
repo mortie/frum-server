@@ -44,18 +44,22 @@ ctx.db.connect(function(err)
 			sock = undefined;
 		});
 
+		//handle incoming messages from the client
 		sock.on("message", function(data)
 		{
+			//figure out which method the client wants to run based on the message
 			var msg = JSON.parse(data);
 			var meth = ctx.methods[msg.m];
 			var req = new Request(msg.r, sock);
 
+			//don't do anything if the method doesn't exist
 			if (meth === undefined)
 			{
 				ctx.util.log("notice", "Bad request: No such method: '"+msg.m+"'");
 				return req.fail("ENOMETH");
 			}
 
+			//check whether all arguments are in place
 			if (meth.args !== undefined)
 			{
 				for (var i in meth.args)
@@ -68,7 +72,28 @@ ctx.db.connect(function(err)
 				}
 			}
 
-			meth(req, msg.d, ctx, session);
+			//check whether all permissions are in place
+			if (meth.perms === undefined)
+			{
+				meth(req, msg.d, ctx, session);
+			}
+			else
+			{
+				ctx.util.getPerms(ctx.db, session.userId, function(err, perms)
+				{
+					var hasPerm = true;
+					meth.perms.forEach(function(perm)
+					{
+						if (perms["perm_"+perm] !== true)
+							hasPerm = false;
+					});
+
+					if (hasPerm)
+						meth(req, msg.d, ctx, session);
+					else
+						req.fail("ENOPERM");
+				});
+			}
 		});
 
 		ctx.util.log("info", "New connection.");

@@ -5,6 +5,8 @@ module.exports = function(req, data, ctx, session)
 		"FROM users, posts, threads "+
 		"WHERE posts.user_id = users.id "+
 		"AND posts.thread_id = $1 "+
+		"AND threads.id = $1 "+
+		"ORDER BY posts.date_created ASC "+
 		"LIMIT "+data.count+" "+
 		"OFFSET "+data.offset,
 		[data.thread_id],

@@ -5,7 +5,12 @@ CREATE TABLE groups
 	perm_invite BOOLEAN NOT NULL,
 	perm_newpost BOOLEAN NOT NULL,
 	perm_newthread BOOLEAN NOT NULL,
-	perm_newcat BOOLEAN NOT NULL
+	perm_newcat BOOLEAN NOT NULL,
+	perm_newgroup BOOLEAN NOT NULL,
+
+	perm_modpost BOOLEAN NOT NULL,
+	perm_modthread BOOLEAN NOT NULL,
+	perm_modcat BOOLEAN NOT NULL,
 );
 
 CREATE TABLE categories

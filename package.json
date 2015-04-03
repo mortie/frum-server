@@ -20,7 +20,7 @@
 	{
 		"ws": "0.7.x",
 		"pg": "4.2.x",
-		"scrypt": "3.0.x",
+		"scrypt": "4.0.x",
 		"prompt": "0.2.x",
 		"marked": "0.3.x"
 	}
